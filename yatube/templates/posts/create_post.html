@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Новый пост{% endblock %}
+{% block content %}
+{% load user_filters %}
+  {% with request.resolver_match.view_name as view_name %}
+    <main>
+      <div class="container py-5">
+        <div class="row justify-content-center">
+          <div class="col-md-8 p-5">
+            <div class="card">
+              <div class="card-header"> 
+                {% if view_name  == 'posts:post_create' %}
+                Добавить запись
+                {% else %}
+                Редактировать запись
+                {% endif %}               
+              </div>
+              <div class="card-body">
+                {% if view_name  == 'posts:post_create' %}        
+                  <form method="post" enctype="multipart/form-data" action="{% url 'posts:post_create' %} ">
+                {% else %}
+                  <form method="post" enctype="multipart/form-data">
+                {% endif %}
+                  {% csrf_token %}
+                  <div class="form-group row my-3 p-3">
+                    <label for="id_text">
+                      Текст поста
+                      <span class="required text-danger" >*</span>                  
+                    </label>
+                    {{ form.text }}               
+                      <small class="form-text text-muted">
+                        {{ form.text.help_text }}
+                      </small>
+                  </div>            
+                  <div class="form-group row my-3 p-3">
+                    <label for="id_group">
+                      Group                  
+                    </label>
+                    {{ form.group|addclass:'form-control' }}
+                      <small class="form-text text-muted">
+                        {{ form.group.help_text }}
+                      </small>
+                  </div>
+                  <div class="form-group row my-3 p-3">
+                    <label for="id_image">
+                      Image                  
+                    </label>
+                    {{ form.image|addclass:'form-control' }}
+                      <small class="form-text text-muted">
+                        {{ form.image.help_text }}
+                      </small>
+                  </div>
+                  <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                      {% if view_name  == 'posts:post_create' %}
+                        Сохранить
+                      {% else %}
+                        Добавить
+                      {% endif %}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  {% endwith %}
+{% endblock %}
+
+
