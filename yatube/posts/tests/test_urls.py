@@ -89,3 +89,126 @@ class PostURLTests(TestCase):
             with self.subTest(address=address):
                 response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
+
+
+class CommentURLTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.guest_client = Client()
+        cls.user = User.objects.create_user(username='Slava')
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user)
+
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test-slug',
+            description='Тестовое описание',
+        )
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовая группа',
+        )
+
+    def test_create_comment_page_guest(self):
+        """Проверяем что происходит редирект
+            не авторизованного пользователя"""
+        path = reverse('posts:add_comment', kwargs={'post_id': self.post.id})
+        response = self.guest_client.get(path=path)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
+
+    def test_create_comment_page_authorized(self):
+        """Проверяем что происходит редирект
+            авторизованного пользователя"""
+        path = reverse('posts:add_comment', kwargs={'post_id': self.post.id})
+        response = self.authorized_client.get(path=path)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
+
+    def test_create_comment_redirect_guest(self):
+        """Проверяем что происходит корректный редирект
+            не авторизованного пользователя"""
+        path = reverse('posts:add_comment', kwargs={'post_id': self.post.id})
+        response = self.guest_client.get(path=path)
+        self.assertRedirects(
+            response, reverse('users:login') + '?next=' + path
+        )
+
+
+class FollowURLTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.guest_client = Client()
+        cls.user = User.objects.create_user(username='Slava')
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user)
+
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test-slug',
+            description='Тестовое описание',
+        )
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовая группа',
+        )
+
+    def test_follow_index_page_guest(self):
+        """Проверяем что происходит редирект
+            не авторизованного пользователя"""
+        path = reverse('posts:follow_index')
+        response = self.guest_client.get(path=path)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
+
+    def test_follow_index_page_authorized(self):
+        """Проверяем что страница подписок работает корректно"""
+        path = reverse('posts:follow_index')
+        response = self.authorized_client.get(path=path)
+        self.assertEqual(response.status_code, HTTPStatus.OK.value)
+
+    def test_follow_index_redirect_guest(self):
+        """Проверяем что происходит корректный редирект
+            не авторизованного пользователя"""
+        path = reverse('posts:follow_index')
+        response = self.guest_client.get(path=path)
+        self.assertRedirects(
+            response, reverse('users:login') + '?next=' + path
+        )
+
+    def test_profile_follow_guest(self):
+        """Проверяем что происходит редирект
+            не авторизованного пользователя"""
+        path = reverse('posts:profile_follow', kwargs={'username': self.user})
+        response = self.guest_client.get(path=path)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
+        self.assertRedirects(
+            response, reverse('users:login') + '?next=' + path
+        )
+
+    def test_profile_follow_authorized(self):
+        """Проверяем что происходит редирект
+            авторизованного пользователя"""
+        path = reverse('posts:profile_follow', kwargs={'username': self.user})
+        response = self.authorized_client.get(path=path)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
+
+    def test_profile_unfollow_guest(self):
+        """Проверяем что происходит редирект
+            не авторизованного пользователя"""
+        path = reverse(
+            'posts:profile_unfollow', kwargs={'username': self.user}
+        )
+        response = self.guest_client.get(path=path)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
+        self.assertRedirects(
+            response, reverse('users:login') + '?next=' + path
+        )
+
+    def test_profile_unfollow_authorized(self):
+        """Проверяем что происходит редирект
+            авторизованного пользователя"""
+        path = reverse(
+            'posts:profile_unfollow', kwargs={'username': self.user}
+        )
+        response = self.authorized_client.get(path=path)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)

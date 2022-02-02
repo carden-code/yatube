@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -17,6 +18,9 @@ class CacheTests(TestCase):
 
     def test_cache(self):
         """Тест для проверки кеширования главной страницы"""
+        template_page_name = reverse('posts:index')
+        self.authorized_client.get(template_page_name)
+
         group = Group.objects.create(
             title='Тестовая группа',
             slug='test_slug',
@@ -28,10 +32,12 @@ class CacheTests(TestCase):
             text='Тестовый пост',
             group=group
         )
-
-        template_page_name = reverse("posts:index")
         response = self.authorized_client.get(template_page_name)
-        Post.objects.filter(id=post.id).delete()
+
+        self.assertNotIn(
+            post, response.context['page_obj']
+        )
+        cache.clear()
         self.assertIn(
             post, response.context['page_obj']
         )

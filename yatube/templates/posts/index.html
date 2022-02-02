@@ -3,7 +3,7 @@
 {% load cache %}
 {% block title %}Последние обновления на сайте{% endblock %}
 {% block content %}
-  <main> 
+  <main>
     <div class="container py-5">     
       <h1>Это главная страница проекта Yatube</h1>
         <article>
@@ -44,9 +44,8 @@
                 {% endif %}
                 {% if not forloop.last %}<hr>{% endif %}
             {% endfor %}
-          {% endcache %} 
-
+          {% endcache %}
           {% include 'posts/includes/paginator.html' %}
-      </div>  
+    </div>
   </main>
 {% endblock %}

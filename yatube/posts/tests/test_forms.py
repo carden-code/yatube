@@ -1,6 +1,7 @@
 import shutil
 import tempfile
 from http import HTTPStatus
+from urllib import request
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -203,12 +204,17 @@ class CommentFormTest(TestCase):
         form_data = {
             'text': 'Текст из формы',
         }
-        self.client.post(
+        response = self.client.post(
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
             data=form_data,
             follow=True
         )
         self.assertEqual(count_comment, self.user.comments.count())
+        self.assertRedirects(
+            response,
+            reverse('users:login') + '?next='
+            + reverse('posts:add_comment', kwargs={'post_id': self.post.id})
+        )
 
     def test_the_comment_appears_on_the_post_page(self):
         """Проверяет, что после успешной отправки
