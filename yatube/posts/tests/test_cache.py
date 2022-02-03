@@ -19,7 +19,7 @@ class CacheTests(TestCase):
     def test_cache(self):
         """Тест для проверки кеширования главной страницы"""
         template_page_name = reverse('posts:index')
-        self.authorized_client.get(template_page_name)
+        response = self.authorized_client.get(template_page_name)
 
         group = Group.objects.create(
             title='Тестовая группа',
@@ -32,12 +32,15 @@ class CacheTests(TestCase):
             text='Тестовый пост',
             group=group
         )
-        response = self.authorized_client.get(template_page_name)
+        # Что то тут не то...
+        # response = self.authorized_client.get(template_page_name)
 
         self.assertNotIn(
             post, response.context['page_obj']
         )
         cache.clear()
+
+        response = self.authorized_client.get(template_page_name)
         self.assertIn(
             post, response.context['page_obj']
         )
