@@ -325,8 +325,11 @@ class FollowTests(TestCase):
     def test_authorized_user_can_delete_subscription(self):
         """Авторизованный пользователь может удалять подписку."""
         author = self.user_2
-        self.authorized_client.post(
-            reverse("posts:profile_follow", kwargs={"username": author})
+        user = self.user
+
+        Follow.objects.create(
+            user=user,
+            author=author
         )
         count_follow = Follow.objects.filter(user=self.user).count()
         self.authorized_client.post(
@@ -337,11 +340,13 @@ class FollowTests(TestCase):
 
     def test_new_post_appears_in_feed_those_follow_him(self):
         """Новая запись пользователя появляется в ленте тех,
-            кто на него подписан и не появляется в ленте тех,
-            кто не подписан."""
+            кто на него подписан."""
         author = self.user_2
-        self.authorized_client.post(
-            reverse("posts:profile_follow", kwargs={"username": author})
+        user = self.user
+
+        Follow.objects.create(
+            user=user,
+            author=author
         )
         group = Group.objects.create(
             title='Тестовая группа',
@@ -356,8 +361,24 @@ class FollowTests(TestCase):
         response = self.authorized_client.get(
             reverse("posts:follow_index")
         )
-        response_2 = self.authorized_client_2.get(
+        self.assertIn(post, response.context['page_obj'])
+
+    def test_new_post_not_appear_in_feed_if_not_follow_author(self):
+        """Новый пост не появляется в ленте подписок,
+            если не подписан на автора"""
+        author = self.user_2
+        group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test_slug',
+            description='Тестовое описание',
+        )
+        post = Post.objects.create(
+            author=author,
+            text='Тестовый пост',
+            group=group
+        )
+        response = self.authorized_client.get(
             reverse("posts:follow_index")
         )
-        self.assertIn(post, response.context['page_obj'])
-        self.assertNotIn(post, response_2.context['page_obj'])
+
+        self.assertNotIn(post, response.context['page_obj'])

@@ -48,8 +48,7 @@ def profile(request, username):
     posts = author.posts.all()
     following = False
     if user.is_authenticated:
-        followers_user = author.following.filter(user=user)
-        if followers_user:
+        if author.following.filter(user=user).exists():
             following = True
     page_obj = pagination_process(request, posts, NUMBER_OF_POSTS)
     template = 'posts/profile.html'
