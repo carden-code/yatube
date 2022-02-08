@@ -22,9 +22,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'w5_7$w14s^e!aoxl@fviikly&bpj_jzwag-cyhp5zra#&nr1-k'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'testserver',
+    'www.karden.pythonanywhere.com',
+    'karden.pythonanywhere.com'
+]
 
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 

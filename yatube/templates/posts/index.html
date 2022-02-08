@@ -12,7 +12,10 @@
             {% for post in page_obj %}
               <ul>
                 <li>
-                  Автор: {{ post.author.get_full_name }}
+                  Автор: 
+                    <a href="{% url 'posts:profile' post.author %}">
+                      {{ post.author.get_full_name }}
+                    </a>
                 </li>
                 <li>
                   Дата публикации: {{ post.pub_date|date:"d E Y" }}
