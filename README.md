@@ -64,6 +64,8 @@ python3 manage.py migrate
 ```
 python3 manage.py runserver
 ```
+# Авторы:
+- Вячеслав (GitHub: https://github.com/carden-code)
 
 # Лицензия
 Этот проект лицензируется в соответствии с лицензией MIT
